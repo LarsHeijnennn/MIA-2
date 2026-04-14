@@ -33,54 +33,45 @@ The schedule is as follows:
 
 The course schedule is summarized below:
 
-| Week | Day | Date   | Time        | Activity         | Module       | Lecturer            | Topic                                                                             |
-| ---- | --- | ------ | ----------- | ---------------- | ------------ | ------------------- | --------------------------------------------------------------------------------- |
-| 1    | Mon | 20/Apr | 08:45-10:45 | Lecture          | Registration | C. Scannell & R. Su | Course introduction; introduction image registration; Geometrical transformations |
-|      | Mon | 20/Apr | 10:45-12:45 | Guided selfstudy | Registration |                     |                                                                                   |
-|      | Thr | 23/Apr | 13:30-15:30 | Lecture          | Registration | R. Su               | Point-based registration                                                          |
-|      | Thr | 23/Apr | 15:30-17:30 | Guided selfstudy | Registration |                     |                                                                                   |
-|      |     |        |             |                  |              |                     |                                                                                   |
-
-| 2 | Thr | 30/Apr | 13:30-15:30 | Lecture | Registration | R. Su | Intensity-based registration |
-| | Thr | 30/Apr | 15:30-17:30 | Guided selfstudy | Registration | | |
-| | | | | | | | |
-
-| 3 | Thr | 07/May | 13:30-15:30 | Lecture | Segmentation | R. Su | Introduction to image segmentation |
-| | Thr | 07/May | 15:30-17:30 | Guided selfstudy | Project work | | |
-| | | | | | | | |
-
-| 4 | Mon | 11/May | 08:45-10:45 | Lecture | Segmentation | R. Su | Segmentation in feature space |
-| | Mon | 11/May | 10:45-12:45 | Guided selfstudy | Project work | | |
-| | | | | | | | |
-
-| 5 | Mon | 18/May | 08:45-10:45 | Lecture | Segmentation | C. Scannell | Graph-cuts |
-| | Mon | 18/May | 10:45-12:45 | Guided selfstudy | Segmentation | | |
-| | Thr | 21/May | 13:30-15:30 | Lecture | Segmentation | C. Scannell | Statistical shape models |
-| | Thr | 21/May | 15:30-17:30 | Guided selfstudy | Segmentation | | |
-| | | | | | | | |
-
-| 6 | Thr | 28/May | 23:59 | DEADLINE Report project 1 (registration) | | | |
-| | Thr | 28/May | 13:30-15:30 | Lecture | DL+applications | C. Scannell | Convolutional neural networks |
-| | Thr | 28/May | 15:30-17:30 | Guided selfstudy | Segmentation | | |
-| | | | | | | | |
-
-| 7 | Mon | 01/Jun | 08:45-10:45 | Lecture | DL+applications | R. Su | Deep learning applications (registration)|
-| | Mon | 01/Jun | 10:45-12:45 | Guided selfstudy | Segmentation | | |
-| | Thr | 04/Jun | 13:30-15:30 | Guest lecture (DeepHealth) | | | |
-| | Thr | 04/Jun | 15:30-17:30 | Guided selfstudy | Segmentation | | |
-| | | | | | | | |
-
-| 8 | Mon | 08/Jun | 08:45-10:45 | Lecture | DL+applications | C. Scannell | Deep learning applications (segmentation)|
-| | Mon | 08/Jun | 10:45-12:45 | Guided selfstudy | Segmentation | | |
-| | Thr | 11/Jun | 13:30-15:30 | Lecture | DL+applications | C. Scannell | Unsupervised deep learning for MIA |
-| | Thr | 11/Jun | 15:30-17:30 | Guided selfstudy | Segmentation | | |
-| | | | | | | | |
-
-| 9 | Mon | 15/Jun | 08:45-10:45 | Lecture | | C. Scannell & R. Su | Questions & preparing for the exam |
-| | Thr | 18/Jun | 23:59 | DEADLINE Report project 2 (Segmentation) | | | |
-| | | | | | | | |
-
-| 10/11 | | CHECK TIMETABLE | | WRITTEN EXAM | | | |
+| Week  | Day | Date            | Time        | Activity                                 | Module          | Lecturer            | Topic                                                                             |
+| ----- | --- | --------------- | ----------- | ---------------------------------------- | --------------- | ------------------- | --------------------------------------------------------------------------------- |
+| 1     | Mon | 20/Apr          | 08:45-10:45 | Lecture                                  | Registration    | C. Scannell & R. Su | Course introduction; introduction image registration; Geometrical transformations |
+|       | Mon | 20/Apr          | 10:45-12:45 | Guided selfstudy                         | Registration    |                     |                                                                                   |
+|       | Thr | 23/Apr          | 13:30-15:30 | Lecture                                  | Registration    | R. Su               | Point-based registration                                                          |
+|       | Thr | 23/Apr          | 15:30-17:30 | Guided selfstudy                         | Registration    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 2     | Thr | 30/Apr          | 13:30-15:30 | Lecture                                  | Registration    | R. Su               | Intensity-based registration                                                      |
+|       | Thr | 30/Apr          | 15:30-17:30 | Guided selfstudy                         | Registration    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 3     | Thr | 07/May          | 13:30-15:30 | Lecture                                  | Segmentation    | R. Su               | Introduction to image segmentation                                                |
+|       | Thr | 07/May          | 15:30-17:30 | Guided selfstudy                         | Project work    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 4     | Mon | 11/May          | 08:45-10:45 | Lecture                                  | Segmentation    | R. Su               | Segmentation in feature space                                                     |
+|       | Mon | 11/May          | 10:45-12:45 | Guided selfstudy                         | Project work    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 5     | Mon | 18/May          | 08:45-10:45 | Lecture                                  | Segmentation    | C. Scannell         | Graph-cuts                                                                        |
+|       | Mon | 18/May          | 10:45-12:45 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       | Thr | 21/May          | 13:30-15:30 | Lecture                                  | Segmentation    | C. Scannell         | Statistical shape models                                                          |
+|       | Thr | 21/May          | 15:30-17:30 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 6     | Thr | 28/May          | 23:59       | DEADLINE Report project 1 (registration) |                 |                     |                                                                                   |
+|       | Thr | 28/May          | 13:30-15:30 | Lecture                                  | DL+applications | C. Scannell         | Convolutional neural networks                                                     |
+|       | Thr | 28/May          | 15:30-17:30 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 7     | Mon | 01/Jun          | 08:45-10:45 | Lecture                                  | DL+applications | R. Su               | Deep learning applications (registration)                                         |
+|       | Mon | 01/Jun          | 10:45-12:45 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       | Thr | 04/Jun          | 13:30-15:30 | Guest lecture (DeepHealth)               |                 |                     |                                                                                   |
+|       | Thr | 04/Jun          | 15:30-17:30 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 8     | Mon | 08/Jun          | 08:45-10:45 | Lecture                                  | DL+applications | C. Scannell         | Deep learning applications (segmentation)                                         |
+|       | Mon | 08/Jun          | 10:45-12:45 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       | Thr | 11/Jun          | 13:30-15:30 | Lecture                                  | DL+applications | C. Scannell         | Unsupervised deep learning for MIA                                                |
+|       | Thr | 11/Jun          | 15:30-17:30 | Guided selfstudy                         | Segmentation    |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 9     | Mon | 15/Jun          | 08:45-10:45 | Lecture                                  |                 | C. Scannell & R. Su | Questions & preparing for the exam                                                |
+|       | Thr | 18/Jun          | 23:59       | DEADLINE Report project 2 (Segmentation) |                 |                     |                                                                                   |
+|       |     |                 |             |                                          |                 |                     |                                                                                   |
+| 10/11 |     | CHECK TIMETABLE |             | WRITTEN EXAM                             |                 |                     |                                                                                   |
 
 ## Lectures handouts and connection with notebooks
 
