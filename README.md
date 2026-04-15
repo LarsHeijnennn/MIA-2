@@ -126,8 +126,8 @@ Course instructors:
 Teaching assistants:
 
 - Joris Mentink
-- Job Schöller
+- Silke Peters
 - Dirk Sollewijn Gelpke
-- Danny Struijk
+- Simon Habraken
 
 The main communication with the teachers will be via Canvas and regularly scheduled lectures/self-study. We recommend the Discussion section in Canvas as the primary communication channel as this is visible for all students and teachers.
