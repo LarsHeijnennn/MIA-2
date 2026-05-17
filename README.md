@@ -29,7 +29,7 @@ The schedule is as follows:
 
 - **Lectures**: Mondays 08:45 – 10:45 & Thursdays 13:30 – 15:30
 - **Guided self-study**: Mondays 10:45 - 12:45 & Thursdays 15:30 - 17:30
-- **Location**: All lectures are in VEC 2.113, and all guided self-study sessions are in VEC 2.105 (check your timetable)
+- **Location**: <del>All lectures are in VEC 2.113, and all guided self-study sessions are in VEC 2.105</del> Lectures have moved to campus (check your timetable)
 
 The course schedule is summarized below:
 
