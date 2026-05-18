@@ -32,7 +32,7 @@ Component  | Insufficient | Satisfactory | Excellent
 
 ## Deliverables checklist
 - Single PDF report (main body items 1–4 within five pages; appendix optional).
-- Single archive file (zip or 7z) containing the completed notebook with the guided project work and theory answers, and the documented Python code, self-contained and able to reproduce the reported results.
+- Single archive file (zip or 7z) containing the pdf with the completed notebooks, the guided project work and theory answers, and the documented Python code, self-contained and able to reproduce the reported results.
 - Contributions section and (if applicable) LLM usage declaration included in the report.
 
 
