@@ -46,9 +46,28 @@ def combining_transforms():
 
     X = util.test_object(1)
 
-    #------------------------------------------------------------------#
-    # TODO: Experiment with combining transformation matrices.
-    #------------------------------------------------------------------#
+    T_rot = reg.rotate(np.pi/4)
+    T_shear = reg.shear(0.4, 0.0)
+
+    X_rot_shear = T_shear.dot(T_rot).dot(X)
+    X_shear_rot = T_rot.dot(T_shear).dot(X)
+
+    fig = plt.figure(figsize=(12,5))
+    ax1 = fig.add_subplot(131)
+    ax2 = fig.add_subplot(132)
+    ax3 = fig.add_subplot(133)
+
+    util.plot_object(ax1, X)
+    util.plot_object(ax2, X_rot_shear)
+    util.plot_object(ax3, X_shear_rot)
+
+    ax1.set_title('Original')
+    ax2.set_title('Rotation then shear')
+    ax3.set_title('Shear then rotation')
+
+    ax1.grid()
+    ax2.grid()
+    ax3.grid()
 
 
 def t2h_test():
@@ -78,9 +97,11 @@ def arbitrary_rotation():
     X = util.test_object(1)
     Xh = util.c2h(X)
 
-    #------------------------------------------------------------------#
-    # TODO: Perform rotation of the test shape around the first vertex
-    #------------------------------------------------------------------#
+    pivot = X[:, 0]
+    T_1 = util.t2h(reg.identity(), pivot)
+    T_2 = util.t2h(reg.rotate(np.pi/4), np.zeros(2))
+    T_3 = util.t2h(reg.identity(), -pivot)
+    T = T_1.dot(T_2).dot(T_3)
 
     X_rot = T.dot(Xh)
 
@@ -136,9 +157,14 @@ def image_transform_test():
 
 def ls_solve_test():
 
-    #------------------------------------------------------------------#
-    # TODO: Test your implementation of the ls_solve definition
-    #------------------------------------------------------------------#
+    A = np.array([[1, 1], [1, 2], [1, 3]], dtype=float)
+    b = np.array([1, 2, 2], dtype=float)
+    w, E = reg.ls_solve(A, b)
+    w_ref, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
+    E_ref = np.transpose(A.dot(w_ref) - b).dot(A.dot(w_ref) - b)
+
+    assert np.allclose(w, w_ref), "Least-squares solution is incorrect"
+    assert np.allclose(E, E_ref), "Least-squares error is incorrect"
 
     print('Test successful!')
 
@@ -194,9 +220,11 @@ def correlation_test():
     # the self correlation should be very close to 1
     assert abs(C1 - 1) < 10e-10, "Correlation function is incorrectly implemented (self correlation test)"
 
-    #------------------------------------------------------------------#
-    # TODO: Implement a few more tests of the correlation definition
-    #------------------------------------------------------------------#
+    C2 = reg.correlation(I, J)
+    assert C2 < C1, "Translated image should correlate less than the original"
+
+    C3 = reg.correlation(I, 255 - I)
+    assert abs(C3 + 1) < 10e-10, "Inverted image should have correlation close to -1"
 
     print('Test successful!')
 
@@ -209,9 +237,13 @@ def mutual_information_test():
     p1 = reg.joint_histogram(I, I)
     MI1 = reg.mutual_information(p1)
 
-    #------------------------------------------------------------------#
-    # TODO: Implement a few tests of the mutual_information definition
-    #------------------------------------------------------------------#
+    N1 = np.random.default_rng(0).integers(0, 255, size=I.shape)
+    p2 = reg.joint_histogram(I, N1)
+    MI2 = reg.mutual_information(p2)
+
+    assert np.isclose(np.sum(p1), 1), "Joint histogram should sum to one"
+    assert MI1 > MI2, "An image should share more information with itself than with random noise"
+    assert MI1 > 0, "Mutual information should be positive"
 
     print('Test successful!')
 
@@ -242,9 +274,13 @@ def ngradient_test():
     g1 = reg.ngradient(exponential, np.ones((1,)))
     assert abs(g1 - exponential(1)) < 1e-5, "Numerical gradient is incorrectly implemented (exponential test)"
 
-    #------------------------------------------------------------------#
-    # TODO: Implement a few more test cases of ngradient
-    #------------------------------------------------------------------#
+    quadratic = lambda x: x[0] ** 2 + 3 * x[1] ** 2
+    g2 = reg.ngradient(quadratic, np.array([2.0, -1.0]))
+    assert np.allclose(g2, np.array([4.0, -6.0]), atol=1e-5), "Numerical gradient is incorrect for a quadratic"
+
+    linear = lambda x: 2 * x[0] - 5 * x[1]
+    g3 = reg.ngradient(linear, np.array([10.0, 3.0]))
+    assert np.allclose(g3, np.array([2.0, -5.0]), atol=1e-10), "Numerical gradient is incorrect for a linear function"
 
     print('Test successful!')
 
