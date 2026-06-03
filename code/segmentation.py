@@ -53,19 +53,17 @@ def extract_coordinate_feature(im):
     n_rows, n_cols = im.shape   
     
     # Find image center
-    x_center = np.floor(n_rows/2)
-    y_center = np.floor(n_cols/2)
+    row_center = np.floor(n_rows/2)
+    col_center = np.floor(n_cols/2)
     
     # Generate coordinate images
-    ar = np.arange(n_cols).reshape(1,-1)
-    x_coord = np.tile(ar, (n_rows, 1))
-    ar = ar.T
-    y_coord = np.tile(ar, (1, n_cols))
+    col_coord = np.tile(np.arange(n_cols).reshape(1, -1), (n_rows, 1))
+    row_coord = np.tile(np.arange(n_rows).reshape(-1, 1), (1, n_cols))
     
     #------------------------------------------------------------------#
     # TODO: Use the above variables to create an image coord_im
     # that combines the information from x_coord and y_coord 
-    coord_im = np.sqrt((x_coord - x_center)**2 + (y_coord - y_center)**2)
+    coord_im = np.sqrt((row_coord - row_center)**2 + (col_coord - col_center)**2)
 
     #------------------------------------------------------------------#
     
