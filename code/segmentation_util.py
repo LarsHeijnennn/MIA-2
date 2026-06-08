@@ -297,10 +297,10 @@ def dice_overlap(true_labels, predicted_labels, smooth=1.):
     p = predicted_labels.flatten()
 
     #------------------------------------------------------------------#
-    # TODO: Implement the missing functionality for Dice overlap
-    pass
+    intersection = np.sum(t * p)
+    dice = (2 * intersection + smooth) / (np.sum(t) + np.sum(p) + smooth)
     #------------------------------------------------------------------#
-    # return dice
+    return dice
 
 
 def dice_multiclass(true_labels, predicted_labels):
@@ -328,7 +328,6 @@ def dice_multiclass(true_labels, predicted_labels):
         temp_true[true_labels != all_classes[i]] = 0  #Everything else is background
 
         temp_predicted = predicted_labels.copy();
-        print(temp_predicted.dtype)
         temp_predicted[predicted_labels == all_classes[i]] = 1
         temp_predicted[predicted_labels != all_classes[i]] = 0
         dice_score[i] = dice_overlap(temp_true.astype(int), temp_predicted.astype(int))
@@ -355,8 +354,6 @@ def classification_error(true_labels, predicted_labels):
     p = predicted_labels.flatten()
 
     #------------------------------------------------------------------#
-    # TODO: Implement the missing functionality for classification error
-    pass
+    err = np.mean(t != p)
     #------------------------------------------------------------------#
-    # return err
-
+    return err
