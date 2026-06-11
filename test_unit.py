@@ -13,3 +13,6 @@ similarity_history = similarity_history[~np.isnan(similarity_history)]
 print("Cleaned history (NaNs removed):")
 print(similarity_history)
 print(f"Shape: {similarity_history.shape}")
+
+num = 3.14159265
+
