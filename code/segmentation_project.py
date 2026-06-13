@@ -6,6 +6,90 @@ import numpy as np
 import segmentation_util as util
 import matplotlib.pyplot as plt
 import segmentation as seg
+from scipy import ndimage
+from scipy import stats
+from sklearn.neighbors import KNeighborsClassifier
+
+
+def _balanced_subset(X, y, max_per_class=500, random_state=0):
+    # keep the training set balanced so background does not dominate tissue votes.
+    rng = np.random.default_rng(random_state)
+    y = y.flatten()
+    selected = []
+
+    for label in np.unique(y):
+        label_idx = np.flatnonzero(y == label)
+        n_keep = min(max_per_class, len(label_idx))
+        selected.append(rng.choice(label_idx, size=n_keep, replace=False))
+
+    selected = np.concatenate(selected)
+    rng.shuffle(selected)
+    return X[selected], y[selected]
+
+
+def _normalize_from_training(train_data, test_data):
+    # distances in knn depend on feature scale, so normalize using training data only.
+    mean_train = np.mean(train_data, axis=0)
+    std_train = np.std(train_data, axis=0)
+    std_train[std_train == 0] = 1
+
+    train_norm = (train_data - mean_train) / std_train
+    test_norm = (test_data - mean_train) / std_train
+    return train_norm, test_norm
+
+
+def _pooled_knn_prediction(train_data_matrix, train_labels_matrix, test_data,
+                           feature_indices, k, random_state):
+    # pool pixels from all training subjects, then train one balanced knn model.
+    n_features = train_data_matrix.shape[1]
+    train_data = np.moveaxis(train_data_matrix, 2, 0).reshape(-1, n_features)
+    train_labels = train_labels_matrix.T.reshape(-1)
+
+    train_data = train_data[:, feature_indices]
+    test_data = test_data[:, feature_indices]
+    train_data, train_labels = _balanced_subset(
+        train_data,
+        train_labels,
+        max_per_class=500,
+        random_state=random_state,
+    )
+    train_data, test_data = _normalize_from_training(train_data, test_data)
+
+    classifier = KNeighborsClassifier(n_neighbors=k)
+    classifier.fit(train_data, train_labels)
+    return classifier.predict(test_data)
+
+
+def _predict_with_numpy_seed(function, random_state, *args, **kwargs):
+    # segmentation_knn uses np.random internally, so wrap it for reproducible demos.
+    random_state_before = np.random.get_state()
+    np.random.seed(random_state)
+    try:
+        return function(*args, **kwargs)
+    finally:
+        np.random.set_state(random_state_before)
+
+
+def _label_majority_vote(predictions, dtype):
+    # majority vote combines several classifiers without looking at test labels.
+    prediction_matrix = np.vstack(predictions).T
+    vote_result = stats.mode(prediction_matrix, axis=1, keepdims=False)
+    return vote_result.mode.astype(dtype, copy=False)
+
+
+def _majority_filter_labels(labels, image_shape=(240, 240)):
+    # small spatial vote: graph-cut-like smoothness prior without fitting on test labels.
+    if labels.size != image_shape[0] * image_shape[1]:
+        return labels
+
+    label_image = labels.reshape(image_shape).astype(int)
+
+    def local_mode(values):
+        values = values.astype(int)
+        return np.bincount(values).argmax()
+
+    filtered = ndimage.generic_filter(label_image, local_mode, size=3, mode='nearest')
+    return filtered.reshape(-1)
 
 
 def segmentation_mymethod(train_data_matrix, train_labels_matrix, test_data, task='brain'):
@@ -20,23 +104,52 @@ def segmentation_mymethod(train_data_matrix, train_labels_matrix, test_data, tas
     # predicted_labels    Predicted labels for the test slice
 
     #------------------------------------------------------------------#
-    #TODO: Implement your method here
-    pass
+    num_features = train_data_matrix.shape[1]
+    all_features = list(range(num_features))
+    context_features = [i for i in [0, 1, 2, 3, 4, 5, 9] if i < num_features]
+    edge_location_features = [i for i in [0, 1, 6, 7, 8] if i < num_features]
+
+    predictions = [
+        _predict_with_numpy_seed(
+            seg.segmentation_combined_knn,
+            0,
+            train_data_matrix,
+            train_labels_matrix,
+            test_data,
+            k=3,
+        ),
+        _pooled_knn_prediction(train_data_matrix, train_labels_matrix, test_data,
+                               all_features, k=3, random_state=1),
+        _pooled_knn_prediction(train_data_matrix, train_labels_matrix, test_data,
+                               all_features, k=7, random_state=2),
+    ]
+
+    if len(context_features) >= 3:
+        predictions.append(
+            _pooled_knn_prediction(train_data_matrix, train_labels_matrix, test_data,
+                                   context_features, k=5, random_state=3)
+        )
+
+    if len(edge_location_features) >= 3:
+        predictions.append(
+            _pooled_knn_prediction(train_data_matrix, train_labels_matrix, test_data,
+                                   edge_location_features, k=5, random_state=4)
+        )
+
+    predicted_labels = _label_majority_vote(predictions, train_labels_matrix.dtype)
+    predicted_labels = _majority_filter_labels(predicted_labels)
+    predicted_labels = predicted_labels.astype(train_labels_matrix.dtype, copy=False)
     #------------------------------------------------------------------#
-    # return predicted_labels
+    return predicted_labels
 
 
 def segmentation_demo():
 
-    train_subject = 1
-    test_subject = 2
     train_slice = 1
-    test_slice = 1
-    task = 'brain'
+    task = 'tissue'
 
     #Load data
-    train_data, train_labels, train_feature_labels = util.create_dataset(train_subject,train_slice,task)
-    test_data, test_labels, test_feature_labels = util.create_dataset(test_subject,test_slice,task)
+    train_data, train_labels, train_feature_labels = util.create_dataset(1,train_slice,task)
 
     # predicted_labels = seg.segmentation_knn(None, train_labels, None)
 
@@ -57,6 +170,7 @@ def segmentation_demo():
     num_images = 5
     num_methods = 3
     im_size = [240, 240]
+    method_names = ['Single k-NN', 'Combined k-NN', 'My method']
 
     all_errors = np.empty([num_images,num_methods])
     all_errors[:] = np.nan
@@ -65,9 +179,8 @@ def segmentation_demo():
 
     all_subjects = np.arange(num_images)
     train_slice = 1
-    task = 'brain'
     all_data_matrix = np.empty([train_data.shape[0],train_data.shape[1],num_images])
-    all_labels_matrix = np.empty([train_labels.size,num_images], dtype=bool)
+    all_labels_matrix = np.empty([train_labels.size,num_images], dtype=int)
 
     #Load datasets once
     print('Loading data for ' + str(num_images) + ' subjects...')
@@ -76,7 +189,7 @@ def segmentation_demo():
         sub = i+1
         train_data, train_labels, train_feature_labels = util.create_dataset(sub,train_slice,task)
         all_data_matrix[:,:,i] = train_data
-        all_labels_matrix[:,i] = train_labels.flatten()
+        all_labels_matrix[:,i] = train_labels.flatten().astype(int)
 
     print('Finished loading data.\nStarting segmentation...')
 
@@ -93,26 +206,64 @@ def segmentation_demo():
         test_labels = all_labels_matrix[:,i]
         test_shape_1 = test_labels.reshape(im_size[0],im_size[1])
 
-        fig = plt.figure(figsize=(10,5))
+        fig = plt.figure(figsize=(15,5))
 
-        predicted_labels = seg.segmentation_combined_knn(train_data_matrix,train_labels_matrix,test_data)
+        predicted_labels = _predict_with_numpy_seed(
+            seg.segmentation_knn,
+            100 + int(i),
+            train_data_matrix[:,:,0],
+            train_labels_matrix[:,0],
+            test_data,
+            k=3,
+        )
         all_errors[i,0] = util.classification_error(test_labels, predicted_labels)
-        all_dice[i,0] = util.dice_overlap(test_labels, predicted_labels)
+        all_dice[i,0] = util.dice_multiclass(test_labels, predicted_labels)
         predicted_mask_1 = predicted_labels.reshape(im_size[0],im_size[1])
-        ax1 = fig.add_subplot(121)
+        ax1 = fig.add_subplot(131)
         ax1.imshow(test_shape_1, 'gray')
         ax1.imshow(predicted_mask_1, 'viridis', alpha=0.5)
         text_str = 'Err {:.4f}, dice {:.4f}'.format(all_errors[i,0], all_dice[i,0])
         ax1.set_xlabel(text_str)
-        ax1.set_title('Subject {}: Combined k-NN'.format(sub))
+        ax1.set_title('Subject {}: Single k-NN'.format(sub))
 
-        predicted_labels = segmentation_mymethod(train_data_matrix,train_labels_matrix,test_data,task)
+        predicted_labels = _predict_with_numpy_seed(
+            seg.segmentation_combined_knn,
+            200 + int(i),
+            train_data_matrix,
+            train_labels_matrix,
+            test_data,
+            k=3,
+        )
         all_errors[i,1] = util.classification_error(test_labels, predicted_labels)
-        all_dice[i,1] = util.dice_overlap(test_labels, predicted_labels)
+        all_dice[i,1] = util.dice_multiclass(test_labels, predicted_labels)
         predicted_mask_2 = predicted_labels.reshape(im_size[0],im_size[1])
-        ax2 = fig.add_subplot(122)
+        ax2 = fig.add_subplot(132)
         ax2.imshow(test_shape_1, 'gray')
         ax2.imshow(predicted_mask_2, 'viridis', alpha=0.5)
         text_str = 'Err {:.4f}, dice {:.4f}'.format(all_errors[i,1], all_dice[i,1])
         ax2.set_xlabel(text_str)
-        ax2.set_title('Subject {}: My method'.format(sub))
+        ax2.set_title('Subject {}: Combined k-NN'.format(sub))
+
+        predicted_labels = segmentation_mymethod(train_data_matrix,train_labels_matrix,test_data,task)
+        all_errors[i,2] = util.classification_error(test_labels, predicted_labels)
+        all_dice[i,2] = util.dice_multiclass(test_labels, predicted_labels)
+        predicted_mask_3 = predicted_labels.reshape(im_size[0],im_size[1])
+        ax3 = fig.add_subplot(133)
+        ax3.imshow(test_shape_1, 'gray')
+        ax3.imshow(predicted_mask_3, 'viridis', alpha=0.5)
+        text_str = 'Err {:.4f}, dice {:.4f}'.format(all_errors[i,2], all_dice[i,2])
+        ax3.set_xlabel(text_str)
+        ax3.set_title('Subject {}: My method'.format(sub))
+        plt.tight_layout()
+
+    print('\nMean tissue segmentation scores across subjects:')
+    print('{:<16} {:>10} {:>10}'.format('method', 'error', 'dice'))
+    print('-' * 40)
+    for j, method_name in enumerate(method_names):
+        print('{:<16} {:>10.4f} {:>10.4f}'.format(
+            method_name,
+            np.nanmean(all_errors[:,j]),
+            np.nanmean(all_dice[:,j]),
+        ))
+
+    return all_errors, all_dice
