@@ -4,7 +4,7 @@ Segmentation module main code.
 
 import numpy as np
 import scipy
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier, NearestCentroid, RadiusNeighborsClassifier
 
 
 # SECTION 1. Segmentation in feature space
@@ -87,14 +87,18 @@ def normalize_data(train_data, test_data=None):
     #              that has been normalized by trainX
     # test_data - (Optional output) num_test x k dataset with Ntest samples
     #             and k features, that has been normalized by trainX
-    
+
     #Find mean and standard deviation of trainX
-    mean_train = np.mean(train_data,axis=0)
-    std_train = np.std(train_data,axis=0)
+    if len(train_data.shape) == 2:
+        mean_train = np.mean(train_data,axis=0)
+        std_train = np.std(train_data,axis=0)
+    elif len(train_data.shape) == 3:
+        mean_train = np.repeat(np.mean(train_data, axis = (0,2))[np.newaxis,:], train_data.shape[0], axis = 0)
+        std_train = np.repeat(np.std(train_data, axis = (0,2))[np.newaxis,:], train_data.shape[0], axis = 0)
 
     # Subtract mean
     train_data = train_data - mean_train
-
+    
     # Divide by standard deviation
     train_data = train_data / std_train
 
@@ -150,7 +154,8 @@ def kmeans_clustering(test_data, K=2):
 
     #------------------------------------------------------------------#
     # TODO: Initialize cluster centers and store them in w_initial
-
+    # M = test_data.shape[1]
+    # w_initial = np.random.rand(K,M)
     #------------------------------------------------------------------#
 
     #Reshape centers to a vector (needed by ngradient)
@@ -166,7 +171,7 @@ def kmeans_clustering(test_data, K=2):
     #------------------------------------------------------------------#
     # TODO: Find distance of each point to each cluster center
     # Then find the minimum distances min_dist and indices min_index
-
+    # D = scipy.spatial.distances.ndist(test_data)
     #------------------------------------------------------------------#
 
     # Sort by intensity of cluster center
@@ -217,6 +222,7 @@ def knn_classifier(train_data, train_labels, test_data, k):
     sort_ix_k = sort_ix[:,:k] # Get the k smallest distances
     predicted_labels = train_labels[sort_ix_k]
     predicted_labels = scipy.stats.mode(predicted_labels, axis=1)[0]
+    print(predicted_labels)
 
     return predicted_labels
 
@@ -299,7 +305,8 @@ def segmentation_knn(train_data, train_labels, test_data, k=1):
 
     # Normalize
     [train_data_norm, test_data_norm] = normalize_data(subset_train_data, test_data);
-
+    
+    
     # Train and apply kNN classifier
 
     # Option 1: The implementation we made in this course (slower)
@@ -307,7 +314,25 @@ def segmentation_knn(train_data, train_labels, test_data, k=1):
 
     # Option 2: The implementation of sklearn (faster)
     neigh = KNeighborsClassifier(n_neighbors=k)
-    neigh.fit(train_data_norm, subset_train_labels)
+    neigh.fit(train_data_norm, train_labels)
     predicted_labels = neigh.predict(test_data_norm)
 
     return predicted_labels
+
+def segmentation_nearest_centroid(train_data, train_labels, test_data):
+    [train_data_norm, test_data_norm] = normalize_data(train_data, test_data);
+    
+    clf = NearestCentroid()
+
+    clf.fit(train_data_norm, train_labels)
+    predicted_labels = clf.predict(test_data_norm)
+    return predicted_labels
+
+def radius_classifier(train_data, train_labels, test_data):
+    [train_data_norm, test_data_norm] = normalize_data(train_data, test_data);
+
+    clf = RadiusNeighborsClassifier()
+    clf.fit(train_data_norm, train_labels)
+    predicted_labels = clf.predict(test_data_norm)
+    return predicted_labels
+
