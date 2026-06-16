@@ -1,0 +1,39 @@
+{
+  "model_type": "KNeighborsClassifier",
+  "k": 3,
+  "task": "tissue",
+  "train_subjects": [
+    1,
+    2,
+    4
+  ],
+  "test_subjects": [
+    3,
+    5
+  ],
+  "slices": [
+    1,
+    2,
+    3
+  ],
+  "max_per_class": 1200,
+  "random_state": 0,
+  "feature_set": "01 raw T1/T2 intensity",
+  "feature_indices": [
+    0,
+    1
+  ],
+  "selected_feature_labels": [
+    "T1 intensity",
+    "T2 intensity"
+  ],
+  "train_shape": [
+    4800,
+    2
+  ],
+  "test_shape": [
+    345600,
+    2
+  ],
+  "saved_model_path": "outputs/open_ended_models/knn_k3_01_raw_t1_t2_intensity.joblib"
+}

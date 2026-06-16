@@ -201,6 +201,7 @@ def extract_features(image_number, slice_number):
     # Local standard deviation is a texture feature. It can highlight areas
     # where the local intensity pattern is less homogeneous.
     t1_local_std = extract_local_std_feature(t1, sigma=2)
+    t2_local_std = extract_local_std_feature(t2, sigma=2)
 
     extra_features = (
         _feature_column(t1_smooth_1),
@@ -211,6 +212,7 @@ def extract_features(image_number, slice_number):
         _feature_column(t2_gradient),
         coordinate_feature,
         t1_local_std,
+        t2_local_std,
     )
 
     X = np.concatenate((X,) + extra_features, axis=1)
@@ -223,6 +225,7 @@ def extract_features(image_number, slice_number):
     features += ('T2 gradient magnitude',)
     features += ('Distance to image center',)
     features += ('T1 local standard deviation',)
+    features += ('T2 local standard deviation',)
     #------------------------------------------------------------------#
     return X, features
 

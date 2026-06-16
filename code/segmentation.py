@@ -267,16 +267,21 @@ def segmentation_combined_knn(train_data_matrix, train_labels_matrix, test_data,
 
     r, c = train_labels_matrix.shape
 
-    predicted_labels = np.empty([r,c])
-    predicted_labels[:] = np.nan
+    predicted_labels = np.empty([r, c], dtype=train_labels_matrix.dtype)
 
     for i in np.arange(c):
-        predicted_labels[:,i] = segmentation_knn(train_data_matrix[:,:,i], train_labels_matrix[:,i], test_data, k)
+        predicted_labels[:, i] = segmentation_knn(
+            train_data_matrix[:, :, i],
+            train_labels_matrix[:, i],
+            test_data,
+            k,
+        ).flatten()
 
-    #Combine labels
-    predicted_labels = scipy.stats.mode(predicted_labels, axis=1)[0]
+    # Combine the labels from the subject-specific classifiers by majority vote.
+    vote_result = scipy.stats.mode(predicted_labels, axis=1, keepdims=False)
+    predicted_labels = vote_result.mode
 
-    return predicted_labels.astype(bool)
+    return predicted_labels.astype(train_labels_matrix.dtype, copy=False)
 
 
 def segmentation_knn(train_data, train_labels, test_data, k=1):

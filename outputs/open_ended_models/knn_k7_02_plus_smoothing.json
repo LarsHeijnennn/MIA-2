@@ -1,0 +1,47 @@
+{
+  "model_type": "KNeighborsClassifier",
+  "k": 7,
+  "task": "tissue",
+  "train_subjects": [
+    1,
+    2,
+    4
+  ],
+  "test_subjects": [
+    3,
+    5
+  ],
+  "slices": [
+    1,
+    2,
+    3
+  ],
+  "max_per_class": 1200,
+  "random_state": 0,
+  "feature_set": "02 + smoothing",
+  "feature_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "selected_feature_labels": [
+    "T1 intensity",
+    "T2 intensity",
+    "T1 Gaussian sigma 1",
+    "T1 Gaussian sigma 3",
+    "T2 Gaussian sigma 1",
+    "T2 Gaussian sigma 3"
+  ],
+  "train_shape": [
+    4800,
+    6
+  ],
+  "test_shape": [
+    345600,
+    6
+  ],
+  "saved_model_path": "outputs/open_ended_models/knn_k7_02_plus_smoothing.joblib"
+}
