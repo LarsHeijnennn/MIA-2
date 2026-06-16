@@ -78,7 +78,7 @@ def _feature_column(feature_image):
 
 def extract_local_std_feature(im, sigma=2):
     # This feature measures local intensity variation around each pixel.
-    # I use it as a simple texture feature: homogeneous tissue regions should
+    # i use it as a simple texture feature: homogeneous tissue regions should
     # have lower values, while boundaries and locally varying regions should
     # have higher values. It only uses the image itself, not the ground truth.
     im = _as_float_image(im)
